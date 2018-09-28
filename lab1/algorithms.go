@@ -4,36 +4,8 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"math/rand"
 	"strings"
 )
-
-// generateRandomRouteHat takes in the number of cities and outputs a random valid route.
-// Routes are made by palcing all the cities inside a hat. Then randomly removes
-// a city from the hat and addes it to the route.
-func generateRandomRoute(noOfCities int) (route []int) {
-	var hat []int
-
-	// Always start with the last city
-	route = []int{noOfCities - 1}
-
-	// Fill the hat with cities
-	for i := 0; i < noOfCities-1; i++ {
-		hat = append(hat, i)
-	}
-
-	for i := 0; i < noOfCities-1; i++ {
-		city := rand.Intn(len(hat))
-
-		route = append(route, hat[city])
-
-		// remove city from the hat
-		hat[city] = hat[len(hat)-1]
-		hat = hat[:len(hat)-1]
-	}
-
-	return
-}
 
 // randomSearch finds the cheapest route around all the cities.
 // It randomly generates a route, checks if it has been seen before,

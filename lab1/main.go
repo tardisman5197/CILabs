@@ -2,16 +2,26 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 func main() {
 	demo()
 	fmt.Printf("\n============\n")
-
-	cities := getCitiesFromFile("ulysses16.csv")
+	fmt.Printf("cities10.csv\n")
+	cities := getCitiesFromFile("files/cities10.csv")
 
 	fmt.Println("Finding Cheapest Route")
-	randomSearch(cities)
+	route, cost := randomSearch(cities)
+	fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
+
+	fmt.Printf("\n============\n")
+	fmt.Printf("cities16.csv\n")
+	cities = getCitiesFromFile("files/cities16.csv")
+
+	fmt.Println("Finding Cheapest Route")
+	route, cost = randomSearch(cities)
+	fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
 }
 
 // demo finds the cheapest route from within the cities
@@ -51,5 +61,32 @@ func getCostOfRoute(cities [][]float64, route []int) (cost float64) {
 		previousCity = city
 	}
 	cost += cities[0][len(cities)-1]
+	return
+}
+
+// generateRandomRouteHat takes in the number of cities and outputs a random valid route.
+// Routes are made by palcing all the cities inside a hat. Then randomly removes
+// a city from the hat and addes it to the route.
+func generateRandomRoute(noOfCities int) (route []int) {
+	var hat []int
+
+	// Always start with the last city
+	route = []int{noOfCities - 1}
+
+	// Fill the hat with cities
+	for i := 0; i < noOfCities-1; i++ {
+		hat = append(hat, i)
+	}
+
+	for i := 0; i < noOfCities-1; i++ {
+		city := rand.Intn(len(hat))
+
+		route = append(route, hat[city])
+
+		// remove city from the hat
+		hat[city] = hat[len(hat)-1]
+		hat = hat[:len(hat)-1]
+	}
+
 	return
 }
