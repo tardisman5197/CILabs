@@ -7,21 +7,22 @@ import (
 
 func main() {
 	demo()
-	fmt.Printf("\n============\n")
-	fmt.Printf("cities10.csv\n")
-	cities := getCitiesFromFile("files/cities10.csv")
+	// fmt.Printf("\n============\n")
+	// fmt.Printf("cities10.csv\n")
+	// cities := getCitiesFromFile("files/cities10.csv")
 
-	fmt.Println("Finding Cheapest Route")
-	route, cost := randomSearch(cities)
-	fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
+	// fmt.Println("Finding Cheapest Route")
+	// route, cost := randomSearch(cities)
+	// fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
 
-	fmt.Printf("\n============\n")
-	fmt.Printf("cities16.csv\n")
-	cities = getCitiesFromFile("files/cities16.csv")
+	// fmt.Printf("\n============\n")
+	// fmt.Printf("cities16.csv\n")
+	// cities = getCitiesFromFile("files/cities16.csv")
 
-	fmt.Println("Finding Cheapest Route")
-	route, cost = randomSearch(cities)
-	fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
+	// fmt.Println("Finding Cheapest Route")
+	// route, cost, costs, times := randomSearch(cities)
+	// fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
+	// plot(costs, times)
 }
 
 // demo finds the cheapest route from within the cities

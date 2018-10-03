@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"strings"
+	"time"
 )
 
 // randomSearch finds the cheapest route around all the cities.
@@ -12,7 +13,7 @@ import (
 // then checks if the route found is cheaper than any previous routes.
 // Once all the permutations have been checked it returns the cheapest
 // route.
-func randomSearch(cities [][]float64) (route []int, cost float64) {
+func randomSearch(cities [][]float64) (route []int, cost float64, costs []float64, times []float64) {
 	cost = math.MaxFloat64
 
 	var noOfPermutations big.Int
@@ -22,6 +23,7 @@ func randomSearch(cities [][]float64) (route []int, cost float64) {
 
 	usedRoutes := make(map[string]bool)
 
+	start := time.Now()
 	// Loop through all permutations
 	for i := int64(0); i < noOfPermutations.Int64(); i++ {
 
@@ -47,6 +49,9 @@ func randomSearch(cities [][]float64) (route []int, cost float64) {
 				if currentCost < cost {
 					route = currentRoute
 					cost = currentCost
+					costs = append(costs, cost)
+					now := time.Now()
+					times = append(times, now.Sub(start).Seconds())
 					fmt.Printf("\nNew cheapest found - %v : %v\n", route, cost)
 				}
 				break
