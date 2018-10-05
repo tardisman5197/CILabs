@@ -5,24 +5,29 @@ import (
 	"math"
 	"math/rand"
 	"strings"
+	"time"
 )
 
-const executeTime = 10
+const executeTime = 5
 
 func main() {
 	// demo()
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	fmt.Printf("\n============\n")
 	fmt.Printf("cities10.csv\n")
 	cities := getCitiesFromFile("files/cities10.csv")
 
 	// fmt.Printf("\n============\n")
 	// fmt.Printf("cities16.csv\n")
-	// cities = getCitiesFromFile("files/cities16.csv")
+	// cities := getCitiesFromFile("files/cities16.csv")
 
 	fmt.Println("Finding Cheapest Route")
-	route, cost, costs, times := localSearch(cities)
-	fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
-	plot(costs, times)
+	route, cost, randomLine := randomSearch(cities)
+	fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n", route, cost)
+	route, cost, localLine := localSearch(cities)
+	fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n", route, cost)
+	plot(randomLine, localLine)
 }
 
 // demo finds the cheapest route from within the cities
@@ -49,7 +54,7 @@ func demo() {
 
 	// randomSearch(cities)
 
-	route, cost, _, _ := localSearch(cities)
+	route, cost, _ := localSearch(cities)
 	fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
 
 }
@@ -123,13 +128,13 @@ func twoOpt(route []int) (twoOptRoutes [][]int) {
 }
 
 // bestNeighbourStep findes the cheapest route out of a set of routes.
-func bestNeighbourStep(cities [][]float64, routes [][]int) (route []int) {
-	cheapest := math.MaxFloat64
+func bestNeighbourStep(cities [][]float64, routes [][]int) (route []int, cost float64) {
+	cost = math.MaxFloat64
 	for _, currentRoute := range routes {
-		cost := getCostOfRoute(cities, currentRoute)
+		currentCost := getCostOfRoute(cities, currentRoute)
 		// fmt.Printf("%v - %v\n", currentRoute, cost)
-		if cost < cheapest {
-			cheapest = cost
+		if currentCost < cost {
+			cost = currentCost
 			route = currentRoute
 		}
 	}
