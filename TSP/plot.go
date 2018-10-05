@@ -59,7 +59,7 @@ func plot(costs []float64, times []float64) {
 
 	fmt.Printf("Plotted Graph: %dx%d\n", image.Bounds().Size().X, image.Bounds().Size().Y)
 
-	out, err := os.Create("/output/output.jpg")
+	out, err := os.Create("output/output.jpg")
 	defer out.Close()
 	if err != nil {
 		fmt.Println(err)

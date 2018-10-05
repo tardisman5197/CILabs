@@ -60,3 +60,7 @@ func randomSearch(cities [][]float64) (route []int, cost float64, costs []float6
 	}
 	return
 }
+
+func localSearch(cities [][]float64) (route []int, cost float64, costs []float64, times []float64) {
+	return
+}
