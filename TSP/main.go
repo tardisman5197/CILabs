@@ -2,27 +2,32 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
+	"strings"
+	"time"
 )
 
-func main() {
-	demo()
-	// fmt.Printf("\n============\n")
-	// fmt.Printf("cities10.csv\n")
-	// cities := getCitiesFromFile("files/cities10.csv")
+const executeTime = 5
 
-	// fmt.Println("Finding Cheapest Route")
-	// route, cost := randomSearch(cities)
-	// fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
+func main() {
+	// demo()
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	fmt.Printf("\n============\n")
+	fmt.Printf("cities10.csv\n")
+	cities := getCitiesFromFile("files/cities10.csv")
 
 	// fmt.Printf("\n============\n")
 	// fmt.Printf("cities16.csv\n")
-	// cities = getCitiesFromFile("files/cities16.csv")
+	// cities := getCitiesFromFile("files/cities16.csv")
 
-	// fmt.Println("Finding Cheapest Route")
-	// route, cost, costs, times := randomSearch(cities)
-	// fmt.Printf("Finished\nRoute: %v, Cost: %v\n", route, cost)
-	// plot(costs, times)
+	fmt.Println("Finding Cheapest Route")
+	route, cost, randomLine := randomSearch(cities)
+	fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n", route, cost)
+	route, cost, localLine := localSearch(cities)
+	fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n", route, cost)
+	plot(randomLine, localLine)
 }
 
 // demo finds the cheapest route from within the cities
@@ -37,17 +42,21 @@ func demo() {
 
 	fmt.Printf("Cities: %v\n\n", cities)
 
-	// Generate a random amount of routes
-	fmt.Printf("Random Routes:\n")
-	for i := 0; i < 10; i++ {
-		route := generateRandomRoute(len(cities))
+	// // Generate a random amount of routes
+	// fmt.Printf("Random Routes:\n")
+	// for i := 0; i < 10; i++ {
+	// 	route := generateRandomRoute(len(cities))
 
-		cost := getCostOfRoute(cities, route)
+	// 	cost := getCostOfRoute(cities, route)
 
-		fmt.Printf("\t%v - Route: %v, Cost: %v\n", i, route, cost)
-	}
+	// 	fmt.Printf("\t%v - Route: %v, Cost: %v\n", i, route, cost)
+	// }
 
-	randomSearch(cities)
+	// randomSearch(cities)
+
+	route, cost, _ := localSearch(cities)
+	fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
+
 }
 
 // getCostOfRoute takes in a route and outputs the distance.
@@ -89,5 +98,45 @@ func generateRandomRoute(noOfCities int) (route []int) {
 		hat = hat[:len(hat)-1]
 	}
 
+	return
+}
+
+// twoOpt finds all of the permutations when swapping two cities in a route.
+// This is done by itterating through each possibilities (e.g. 0 <-> 0, 0 <-> 1 ...)
+// and only adding routes that have not been found previous to the list of routes.
+func twoOpt(route []int) (twoOptRoutes [][]int) {
+	usedRoutes := make(map[string]bool)
+	for i := 0; i < len(route); i++ {
+		for j := 0; j < len(route); j++ {
+			currentRoute := make([]int, len(route))
+			copy(currentRoute, route)
+
+			// Swap i and j
+			tmp := currentRoute[i]
+			currentRoute[i] = currentRoute[j]
+			currentRoute[j] = tmp
+
+			// Check if route has already been used
+			currentRouteStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(currentRoute)), ""), "[]")
+			if _, used := usedRoutes[currentRouteStr]; !used {
+				usedRoutes[currentRouteStr] = true
+				twoOptRoutes = append(twoOptRoutes, currentRoute)
+			}
+		}
+	}
+	return
+}
+
+// bestNeighbourStep findes the cheapest route out of a set of routes.
+func bestNeighbourStep(cities [][]float64, routes [][]int) (route []int, cost float64) {
+	cost = math.MaxFloat64
+	for _, currentRoute := range routes {
+		currentCost := getCostOfRoute(cities, currentRoute)
+		// fmt.Printf("%v - %v\n", currentRoute, cost)
+		if currentCost < cost {
+			cost = currentCost
+			route = currentRoute
+		}
+	}
 	return
 }
