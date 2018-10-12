@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"sort"
 )
@@ -81,6 +82,7 @@ func (a *AntennaArray) evaluate(design []float64) (peakSSL float64, err error) {
 	}
 
 	if !a.isValid(design) {
+		fmt.Printf("is not valid\n")
 		return math.MaxFloat64, nil
 	}
 
@@ -89,13 +91,17 @@ func (a *AntennaArray) evaluate(design []float64) (peakSSL float64, err error) {
 		power     float64
 	}
 
+	// Find all the peaks in power
+
 	var peaks []powerPeak
 
-	previous := powerPeak{0.0, -math.MaxFloat64}
+	previous := powerPeak{0.0, math.SmallestNonzeroFloat64}
 	current := powerPeak{0.0, a.arrayFactor(design, 0.0)}
 
 	for elevation := 0.01; elevation <= 180.0; elevation += 0.01 {
+
 		next := powerPeak{elevation, a.arrayFactor(design, elevation)}
+
 		if current.power >= previous.power && current.power >= next.power {
 			peaks = append(peaks, current)
 		}
@@ -104,10 +110,10 @@ func (a *AntennaArray) evaluate(design []float64) (peakSSL float64, err error) {
 	}
 	peaks = append(peaks, powerPeak{180.0, a.arrayFactor(design, 180.0)})
 
-	sort.Slice(peaks, func(i, j int) bool { return peaks[i].power < peaks[j].power })
+	sort.Slice(peaks, func(i, j int) bool { return peaks[i].power > peaks[j].power })
 
 	if len(peaks) < 2 {
-		return -math.MaxFloat64, nil
+		return math.SmallestNonzeroFloat64, nil
 	}
 
 	distanceFromSteering := math.Abs(peaks[0].elevation - a.steeringAngle)
