@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"sort"
 )
@@ -82,7 +81,7 @@ func (a *AntennaArray) evaluate(design []float64) (peakSSL float64, err error) {
 	}
 
 	if !a.isValid(design) {
-		fmt.Printf("is not valid\n")
+		// fmt.Printf("is not valid\n")
 		return math.MaxFloat64, nil
 	}
 

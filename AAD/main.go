@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"time"
 )
 
 const executeTime = 10
 
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	// var a AntennaArray
 	// a.noOfAntennae = 3
 	// a.steeringAngle = 90
@@ -19,7 +22,9 @@ func main() {
 	// // }
 	// // fmt.Printf("Peak SSL: %v\n", peakSSL)
 
-	design, peakSSL := randomSearch(3, 90)
+	// design, peakSSL := randomSearch(3, 90)
+
+	design, peakSSL := PSO(3, 90)
 	fmt.Printf("Design: %v PeakSSL: %v\n", design, peakSSL)
 }
 
