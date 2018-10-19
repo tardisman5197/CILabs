@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"math/rand"
 	"time"
 )
 
@@ -52,8 +51,9 @@ func PSO(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL flo
 		currentParticle.pBest = currentParticle.currentPostion
 		currentParticle.pBestPeak, _ = a.evaluate(currentParticle.currentPostion)
 		currentParticle.currentVelocity = make([]float64, noOfAntennae)
-		for i := range currentParticle.currentVelocity {
-			currentParticle.currentVelocity[i] = rand.Float64()
+		tmp := randomDesign(noOfAntennae)
+		for i, pos := range currentParticle.currentPostion {
+			currentParticle.currentVelocity[i] = (tmp[i] - pos) / 2
 		}
 		population = append(population, currentParticle)
 	}
@@ -79,13 +79,18 @@ func PSO(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL flo
 		// 1. UPDATE velocity and position
 		// 2. EVALUATE new position
 		// 3. UPDATE personal best
-		for _, cParticle := range population {
-			cParticle.update(gBest)
+		for j := 0; j < len(population); j++ {
+			population[j].update(gBest)
 			// evaluate also updates the personal best
-			cParticle.evalulate(a)
-			// if i == 0 {
-			// 	fmt.Printf("\r%v : %v : %v", cParticle.currentPostion, cParticle.currentVelocity, cParticle.pBestPeak)
+			// if j == 0 {
+			// 	fmt.Printf("%v: %v : V %v \n%v: %v : %v\n", i, population[j].currentPostion, population[j].currentVelocity, i, population[j].pBest, population[j].pBestPeak)
 			// }
+			population[j].evalulate(a)
+			// if j == 0 {
+			// 	fmt.Printf("Better: %v\n", better)
+			// 	fmt.Printf("%v: %v : V %v \n%v: %v : %v\n\n", i, population[j].currentPostion, population[j].currentVelocity, i, population[j].pBest, population[j].pBestPeak)
+			// }
+
 		}
 
 		// Termination condition
