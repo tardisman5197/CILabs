@@ -81,6 +81,10 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 	return
 }
 
+// localSearch finds the best route it can in a given time. This is
+// done by generating a random route, then getting all the variations
+// of that route. From them permitations the best is found to start the
+// next iteration. This repeats until the best in that nbourhood is found.
 func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost float64, line [][]float64) {
 	start := time.Now()
 	line = [][]float64{{}, {}}

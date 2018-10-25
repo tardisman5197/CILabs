@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// randomSearch finds a solution by finding random designs
+// and comparing them against previous designs untill the
+// the best is found.
 func randomSearch(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL float64) {
 	start := time.Now()
 
@@ -36,7 +39,9 @@ func randomSearch(noOfAntennae int, steeringAngle float64) (design []float64, pe
 	return
 }
 
-// PSO ..
+// PSO (Particle Swarm Optimisation) finds the best design
+// by creating a population of valid solutions, then flocking
+// towards the best soloution in the population.
 func PSO(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL float64) {
 	var a AntennaArray
 	a.noOfAntennae = noOfAntennae

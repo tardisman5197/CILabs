@@ -28,6 +28,7 @@ func main() {
 	fmt.Printf("Design: %v PeakSSL: %v\n", design, peakSSL)
 }
 
+// randomDesign gets a random valid design.
 func randomDesign(noOfAntennae int) (design []float64) {
 	var a AntennaArray
 	a.noOfAntennae = noOfAntennae
