@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"math/rand"
 	"strings"
 	"time"
 )
@@ -145,6 +146,87 @@ func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost floa
 			line[1] = append(line[1], globalBestCost)
 			line[0] = append(line[0], now.Sub(start).Seconds())
 			break
+		}
+	}
+	return
+}
+
+// evolutionaryAlgorithm finds a solution by applying methods used by evolution.
+func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
+	var population []Route
+
+	// Init population with random routes and Eval the routes.
+	fmt.Printf("Init pop\n")
+	for i := 0; i < populationSize; i++ {
+		var currentRoute Route
+		currentRoute.route = generateRandomRoute(len(cities))
+		currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+		population = append(population, currentRoute)
+	}
+
+	fmt.Printf("Population: %v\n", population)
+
+	// Repeat until termination
+
+	for i := 0; i < 10; i++ {
+		// Parent Selection
+		// Tournament slection:
+		//	1. Pick k memebers at random
+		//	2. Choose the best out of the selection
+		//	3. Repeate until pop size reached
+		k := 2
+		var parents []Route
+
+		fmt.Printf("%v: Select Parents\n", i)
+		for j := 0; j < populationSize; j++ {
+			var parent Route
+			parent.cost = math.MaxFloat64
+			for m := 0; m < k; m++ {
+				// Get next random parent
+				currentParent := population[rand.Intn(populationSize)]
+				// Check if better then the current best
+				if currentParent.cost < parent.cost {
+					parent = currentParent
+				}
+			}
+			parents = append(parents, parent)
+			fmt.Printf("\t%v: %v\n", j, parent)
+		}
+
+		var offspring []Route
+
+		fmt.Printf("%v: Create offspring\n", i)
+		for j := 0; j < populationSize; j++ {
+			fmt.Printf("\t%v:\n", j)
+			var currentOffspring Route
+			// Recombine parents
+			currentOffspring.route = orderOneCrossover(parents[j].route, parents[rand.Intn(populationSize)].route)
+			fmt.Printf("\t\tComb: %v\n", currentOffspring)
+			// Mutate
+			if rand.Float64() <= mutateProbability {
+				// Swap two cities at random
+				x := rand.Intn(len(currentOffspring.route))
+				y := rand.Intn(len(currentOffspring.route))
+				tmp := currentOffspring.route[x]
+				currentOffspring.route[x] = currentOffspring.route[y]
+				currentOffspring.route[y] = currentOffspring.route[tmp]
+			}
+			fmt.Printf("\t\tMuta: %v\n", currentOffspring)
+			// Evaluate
+			currentOffspring.cost = getCostOfRoute(cities, currentOffspring.route)
+			fmt.Printf("\t\tEval: %v\n", currentOffspring)
+			offspring = append(offspring, currentOffspring)
+		}
+
+		// Select next gen
+		population = offspring
+	}
+
+	bestCost = math.MaxFloat64
+	for i := 0; i < len(population); i++ {
+		if population[i].cost < bestCost {
+			bestRoute = population[i].route
+			bestCost = population[i].cost
 		}
 	}
 	return
