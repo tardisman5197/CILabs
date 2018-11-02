@@ -10,15 +10,22 @@ import (
 
 const executeTime = 5
 const populationSize = 10
+
+// Evolutionary Algorithm Params
 const mutateProbability = 0.7
+
+// Artifical Immune System Params
+const replacementSize = 2
+const cloneSizeFactor = 2
+const bestFitness = -100
 
 func main() {
 	// demo()
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	// fmt.Printf("\n============\n")
-	// fmt.Printf("cities10.csv\n")
-	// cities := getCitiesFromFile("files/cities10.csv")
+	fmt.Printf("\n============\n")
+	fmt.Printf("cities10.csv\n")
+	cities := getCitiesFromFile("files/cities10.csv")
 
 	// fmt.Printf("\n============\n")
 	// fmt.Printf("cities16.csv\n")
@@ -34,9 +41,12 @@ func main() {
 	// route, cost, _ := evolutionaryAlgorithm(cities)
 	// fmt.Printf("Evolution Finished\nRoute: %v, Cost: %v\n", route, cost)
 
-	p1 := []int{0, 1, 2, 3, 4, 5}
-	p2 := []int{5, 4, 3, 2, 1, 0}
-	fmt.Printf("Child: %v\n", orderOneCrossover(p1, p2))
+	// p1 := []int{0, 1, 2, 3, 4, 5}
+	// p2 := []int{5, 4, 3, 2, 1, 0}
+	// fmt.Printf("Child: %v\n", orderOneCrossover(p1, p2))
+
+	route, cost, _ := artificialImmuneSystem(cities)
+	fmt.Printf("artificialImmuneSystem Finished\nRoute: %v, Cost: %v\n", route, cost)
 }
 
 // demo finds the cheapest route from within the cities

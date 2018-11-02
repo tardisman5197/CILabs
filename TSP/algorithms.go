@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"sort"
 	"strings"
 	"time"
 )
@@ -228,6 +229,80 @@ func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float6
 			bestRoute = population[i].route
 			bestCost = population[i].cost
 		}
+	}
+	return
+}
+
+// artificialImmuneSystem finds a solution for TSP, by using methods similar to
+// an immune system.
+func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
+	var population []Route
+
+	// Init population with random routes and Eval the routes.
+	fmt.Printf("Init pop\n")
+	for i := 0; i < populationSize; i++ {
+		var currentRoute Route
+		currentRoute.route = generateRandomRoute(len(cities))
+		currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+		population = append(population, currentRoute)
+	}
+
+	fmt.Printf("Population: %v\n", population)
+
+	// Repeat until terminating condition
+	for i := 0; i < 10; i++ {
+		fmt.Printf("%v\n", i)
+		// Cloning
+		var clonePool []Route
+		for j := 0; j < len(population); j++ {
+			for k := 0; k < cloneSizeFactor; k++ {
+				currentClone := Route{}
+				currentClone.cost = population[j].cost
+				currentClone.route = make([]int, len(population[j].route))
+				copy(currentClone.route, population[j].route)
+				clonePool = append(clonePool, currentClone)
+			}
+		}
+
+		// Mutation
+		for j := 0; j < len(clonePool); j++ {
+			// Random hotspot
+			start := rand.Intn(len(clonePool[j].route))
+
+			// length = routeLength * f/fBest
+			length := int((clonePool[j].cost / bestFitness)) * len(clonePool[j].route)
+
+			// Reverse the section
+			var tmp []int
+			for k := 0; k < length; k++ {
+				tmp = append(tmp, clonePool[j].route[(k+start)%len(clonePool[j].route)])
+			}
+
+			for k := 0; k < length; k++ {
+				clonePool[j].route[(k+start)%len(clonePool[j].route)] = tmp[len(tmp)-k]
+			}
+
+			clonePool[j].cost = getCostOfRoute(cities, clonePool[j].route)
+			fmt.Printf("\t%v: %v\n", j, clonePool[j])
+		}
+
+		// Selection
+		population = append(population, clonePool...)
+
+		sort.SliceStable(population, func(i, j int) bool { return population[i].cost < population[j].cost })
+
+		population = population[:populationSize]
+
+		// Metadynamics
+		for j := 1; j <= replacementSize; j++ {
+			var currentRoute Route
+			currentRoute.route = generateRandomRoute(len(cities))
+			currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+			population[len(population)-j] = currentRoute
+		}
+
+		bestRoute = population[0].route
+		bestCost = population[0].cost
 	}
 	return
 }
