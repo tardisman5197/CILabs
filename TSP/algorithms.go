@@ -234,24 +234,21 @@ func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float6
 }
 
 // artificialImmuneSystem finds a solution for TSP, by using methods similar to
-// an immune system.
+// an immune system. The steps that this algorithm takes are as follows:
+// 	1. Initiation, create random soloutions
+//	2. Cloning, make beta amount of copies
+//	3. Mutation, inverse proportional hyper-mutation
+//	4. Selection, choose the best mu for the next population
+//	5. Metadynamics, repace the worst d with random solutions
+//	6. Repeat until termination condition
 func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
 	var population []Route
 
 	// Init population with random routes and Eval the routes.
-	fmt.Printf("Init pop\n")
-	for i := 0; i < populationSize; i++ {
-		var currentRoute Route
-		currentRoute.route = generateRandomRoute(len(cities))
-		currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
-		population = append(population, currentRoute)
-	}
-
-	fmt.Printf("Population: %v\n", population)
+	population = generateRandomPopulation(cities, populationSize)
 
 	// Repeat until terminating condition
-	for i := 0; i < 10; i++ {
-		fmt.Printf("%v\n", i)
+	for i := 0; i < 2000; i++ {
 		// Cloning
 		var clonePool []Route
 		for j := 0; j < len(population); j++ {
@@ -269,21 +266,24 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 			// Random hotspot
 			start := rand.Intn(len(clonePool[j].route))
 
-			// length = routeLength * f/fBest
-			length := int((clonePool[j].cost / bestFitness)) * len(clonePool[j].route)
+			size := len(clonePool[j].route)
+
+			// length = routeLength * exp(-p*f/fBest)
+			inv := math.Exp(-0.5 * (clonePool[j].cost / bestFitness))
+			lengthFloat := inv * float64(size)
+			length := int(lengthFloat)
 
 			// Reverse the section
 			var tmp []int
 			for k := 0; k < length; k++ {
-				tmp = append(tmp, clonePool[j].route[(k+start)%len(clonePool[j].route)])
+				tmp = append(tmp, clonePool[j].route[(k+start)%size])
 			}
 
 			for k := 0; k < length; k++ {
-				clonePool[j].route[(k+start)%len(clonePool[j].route)] = tmp[len(tmp)-k]
+				clonePool[j].route[(k+start)%size] = tmp[len(tmp)-(k+1)]
 			}
 
 			clonePool[j].cost = getCostOfRoute(cities, clonePool[j].route)
-			fmt.Printf("\t%v: %v\n", j, clonePool[j])
 		}
 
 		// Selection

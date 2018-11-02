@@ -17,27 +17,31 @@ const mutateProbability = 0.7
 // Artifical Immune System Params
 const replacementSize = 2
 const cloneSizeFactor = 2
-const bestFitness = -100
+const bestFitness = 50
 
 func main() {
-	// demo()
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	fmt.Printf("\n============\n")
-	fmt.Printf("cities10.csv\n")
-	cities := getCitiesFromFile("files/cities10.csv")
-
+	// Read Files
 	// fmt.Printf("\n============\n")
-	// fmt.Printf("cities16.csv\n")
-	// cities := getCitiesFromFile("files/cities16.csv")
+	// fmt.Printf("cities10.csv\n")
+	// cities10 := getCitiesFromFile("files/cities10.csv")
 
-	fmt.Println("Finding Cheapest Route")
+	fmt.Printf("\n============\n")
+	fmt.Printf("cities16.csv\n")
+	cities16 := getCitiesFromFile("files/cities16.csv")
+
+	fmt.Printf("\n============\nStarting Algorithms\n\n")
+
+	// Random Search
 	// route, cost, randomLine := randomSearch(cities)
 	// fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n", route, cost)
+
+	// Local Search
 	// route, cost, localLine := localSearch(cities)
 	// fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n", route, cost)
-	// plot(randomLine, localLine)
 
+	// Evolutionary Algorithm
 	// route, cost, _ := evolutionaryAlgorithm(cities)
 	// fmt.Printf("Evolution Finished\nRoute: %v, Cost: %v\n", route, cost)
 
@@ -45,8 +49,10 @@ func main() {
 	// p2 := []int{5, 4, 3, 2, 1, 0}
 	// fmt.Printf("Child: %v\n", orderOneCrossover(p1, p2))
 
-	route, cost, _ := artificialImmuneSystem(cities)
-	fmt.Printf("artificialImmuneSystem Finished\nRoute: %v, Cost: %v\n", route, cost)
+	// Artificial Immune System
+	fmt.Printf("Starting Artificial Immune System\n")
+	route, cost, _ := artificialImmuneSystem(cities16)
+	fmt.Printf("Artificial Immune System Finished!\nRoute: %v, Cost: %v\n", route, cost)
 }
 
 // demo finds the cheapest route from within the cities
@@ -61,20 +67,8 @@ func demo() {
 
 	fmt.Printf("Cities: %v\n\n", cities)
 
-	// // Generate a random amount of routes
-	// fmt.Printf("Random Routes:\n")
-	// for i := 0; i < 10; i++ {
-	// 	route := generateRandomRoute(len(cities))
-
-	// 	cost := getCostOfRoute(cities, route)
-
-	// 	fmt.Printf("\t%v - Route: %v, Cost: %v\n", i, route, cost)
-	// }
-
-	// randomSearch(cities)
-
-	route, cost, _ := localSearch(cities)
-	fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
+	// route, cost, _ := localSearch(cities)
+	// fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
 
 }
 
@@ -156,6 +150,18 @@ func bestNeighbourStep(cities [][]float64, routes [][]int) (route []int, cost fl
 			cost = currentCost
 			route = currentRoute
 		}
+	}
+	return
+}
+
+// generateRandomPopulation retruns a slice of route structs containg randomly
+// generated routes with their costs.
+func generateRandomPopulation(cities [][]float64, popSize int) (population []Route) {
+	for i := 0; i < populationSize; i++ {
+		var currentRoute Route
+		currentRoute.route = generateRandomRoute(len(cities))
+		currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+		population = append(population, currentRoute)
 	}
 	return
 }
