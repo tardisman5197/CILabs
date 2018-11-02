@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"sort"
 	"strings"
 	"time"
 )
@@ -228,6 +229,80 @@ func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float6
 			bestRoute = population[i].route
 			bestCost = population[i].cost
 		}
+	}
+	return
+}
+
+// artificialImmuneSystem finds a solution for TSP, by using methods similar to
+// an immune system. The steps that this algorithm takes are as follows:
+// 	1. Initiation, create random soloutions
+//	2. Cloning, make beta amount of copies
+//	3. Mutation, inverse proportional hyper-mutation
+//	4. Selection, choose the best mu for the next population
+//	5. Metadynamics, repace the worst d with random solutions
+//	6. Repeat until termination condition
+func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
+	var population []Route
+
+	// Init population with random routes and Eval the routes.
+	population = generateRandomPopulation(cities, populationSize)
+
+	// Repeat until terminating condition
+	for i := 0; i < 2000; i++ {
+		// Cloning
+		var clonePool []Route
+		for j := 0; j < len(population); j++ {
+			for k := 0; k < cloneSizeFactor; k++ {
+				currentClone := Route{}
+				currentClone.cost = population[j].cost
+				currentClone.route = make([]int, len(population[j].route))
+				copy(currentClone.route, population[j].route)
+				clonePool = append(clonePool, currentClone)
+			}
+		}
+
+		// Mutation
+		for j := 0; j < len(clonePool); j++ {
+			// Random hotspot
+			start := rand.Intn(len(clonePool[j].route))
+
+			size := len(clonePool[j].route)
+
+			// length = routeLength * exp(-p*f/fBest)
+			inv := math.Exp(-0.5 * (clonePool[j].cost / bestFitness))
+			lengthFloat := inv * float64(size)
+			length := int(lengthFloat)
+
+			// Reverse the section
+			var tmp []int
+			for k := 0; k < length; k++ {
+				tmp = append(tmp, clonePool[j].route[(k+start)%size])
+			}
+
+			for k := 0; k < length; k++ {
+				clonePool[j].route[(k+start)%size] = tmp[len(tmp)-(k+1)]
+			}
+
+			clonePool[j].cost = getCostOfRoute(cities, clonePool[j].route)
+		}
+
+		// Selection
+		population = append(population, clonePool...)
+
+		sort.SliceStable(population, func(i, j int) bool { return population[i].cost < population[j].cost })
+
+		population = population[:populationSize]
+
+		// Metadynamics
+		for j := 1; j <= replacementSize; j++ {
+			var currentRoute Route
+			currentRoute.route = generateRandomRoute(len(cities))
+			currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+			population[len(population)-j] = currentRoute
+		}
+
+		bestRoute = population[0].route
+		bestCost = population[0].cost
 	}
 	return
 }
