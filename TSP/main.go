@@ -9,7 +9,7 @@ import (
 )
 
 const executeTime = 5
-const populationSize = 10
+const populationSize = 5
 
 // Evolutionary Algorithm Params
 const mutateProbability = 0.7
@@ -17,36 +17,43 @@ const mutateProbability = 0.7
 // Artifical Immune System Params
 const replacementSize = 2
 const cloneSizeFactor = 2
-const bestFitness = -100
+const bestFitness = 50
 
+// main is the func that is called when starting the application.
 func main() {
-	// demo()
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	fmt.Printf("\n============\n")
-	fmt.Printf("cities10.csv\n")
-	cities := getCitiesFromFile("files/cities10.csv")
-
+	// Read Files
 	// fmt.Printf("\n============\n")
-	// fmt.Printf("cities16.csv\n")
-	// cities := getCitiesFromFile("files/cities16.csv")
+	// fmt.Printf("cities10.csv\n")
+	// cities10 := getCitiesFromFile("files/cities10.csv")
 
-	fmt.Println("Finding Cheapest Route")
+	fmt.Printf("\n============\n")
+	fmt.Printf("cities16.csv\n")
+	cities16 := getCitiesFromFile("files/cities16.csv")
+
+	fmt.Printf("\n============\nStarting Algorithms\n\n")
+
+	// Random Search
 	// route, cost, randomLine := randomSearch(cities)
 	// fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n", route, cost)
+
+	// Local Search
 	// route, cost, localLine := localSearch(cities)
 	// fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n", route, cost)
-	// plot(randomLine, localLine)
 
-	// route, cost, _ := evolutionaryAlgorithm(cities)
+	// Evolutionary Algorithm
+	// route, cost, _ := evolutionaryAlgorithm(cities16)
 	// fmt.Printf("Evolution Finished\nRoute: %v, Cost: %v\n", route, cost)
 
 	// p1 := []int{0, 1, 2, 3, 4, 5}
 	// p2 := []int{5, 4, 3, 2, 1, 0}
 	// fmt.Printf("Child: %v\n", orderOneCrossover(p1, p2))
 
-	route, cost, _ := artificialImmuneSystem(cities)
-	fmt.Printf("artificialImmuneSystem Finished\nRoute: %v, Cost: %v\n", route, cost)
+	// Artificial Immune System
+	fmt.Printf("Starting Artificial Immune System\n")
+	route, cost, _ := artificialImmuneSystem(cities16)
+	fmt.Printf("Artificial Immune System Finished!\nRoute: %v, Cost: %v\n", route, cost)
 }
 
 // demo finds the cheapest route from within the cities
@@ -61,20 +68,8 @@ func demo() {
 
 	fmt.Printf("Cities: %v\n\n", cities)
 
-	// // Generate a random amount of routes
-	// fmt.Printf("Random Routes:\n")
-	// for i := 0; i < 10; i++ {
-	// 	route := generateRandomRoute(len(cities))
-
-	// 	cost := getCostOfRoute(cities, route)
-
-	// 	fmt.Printf("\t%v - Route: %v, Cost: %v\n", i, route, cost)
-	// }
-
-	// randomSearch(cities)
-
-	route, cost, _ := localSearch(cities)
-	fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
+	// route, cost, _ := localSearch(cities)
+	// fmt.Printf("Cheapest Route: %v - %v\n", route, cost)
 
 }
 
@@ -160,12 +155,27 @@ func bestNeighbourStep(cities [][]float64, routes [][]int) (route []int, cost fl
 	return
 }
 
+// generateRandomPopulation retruns a slice of route structs containg randomly
+// generated routes with their costs.
+func generateRandomPopulation(cities [][]float64, popSize int) (population []Route) {
+	for i := 0; i < populationSize; i++ {
+		var currentRoute Route
+		currentRoute.route = generateRandomRoute(len(cities))
+		currentRoute.cost = getCostOfRoute(cities, currentRoute.route)
+		population = append(population, currentRoute)
+	}
+	return
+}
+
 // orderOneCrossover takes two parents and combines them to make a child.
 // This is achived by random selecting a section of one parent to make up part
 // of the offspring then filling the remaining gaps with the cities not used in
 // the order of the other parent.
 func orderOneCrossover(p1 []int, p2 []int) (child []int) {
 	child = make([]int, len(p1))
+	for i := 0; i < len(child); i++ {
+		child[i] = -1
+	}
 
 	// Randomly select the section of one parent and give to child
 	start := rand.Intn(len(p1))
@@ -176,31 +186,32 @@ func orderOneCrossover(p1 []int, p2 []int) (child []int) {
 		start = end
 		end = tmp
 	}
-	fmt.Printf("start: %v\n", start)
-	fmt.Printf("end: %v\n", end)
 
 	used := make(map[int]bool)
-	for i := start; i < end; i++ {
+
+	for i := start; i <= end; i++ {
 		child[i] = p1[i]
 		used[p1[i]] = true
 	}
 
 	// Fill gaps in child with other parent
 	var tmp []int
+
 	for i := 0; i < len(p2); i++ {
 		if _, ok := used[p2[i]]; !ok {
 			tmp = append(tmp, p2[i])
 		}
 	}
 
+	next := 0
+	fmt.Printf("Start: %v\nEnd: %v\n", start, end)
+	fmt.Printf("Tmp: %v\n", tmp)
 	for i := 0; i < len(child); i++ {
-		if i >= start && i < end {
-			// Get next city
-			child[i] = tmp[0]
-			// pop city from p2
-			if len(tmp) > 1 {
-				tmp = tmp[1:]
-			}
+		if child[i] == -1 {
+			fmt.Printf("NExt: %v\n", next)
+			nextValue := tmp[next]
+			child[i] = nextValue
+			next++
 		}
 	}
 
