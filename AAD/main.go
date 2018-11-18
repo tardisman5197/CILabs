@@ -24,7 +24,7 @@ func main() {
 
 	// design, peakSSL := randomSearch(3, 90)
 
-	design, peakSSL := PSO(3, 90)
+	design, peakSSL := PSO(10, 90)
 	fmt.Printf("Design: %v PeakSSL: %v\n", design, peakSSL)
 }
 

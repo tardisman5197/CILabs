@@ -9,7 +9,7 @@ import (
 )
 
 const executeTime = 5
-const populationSize = 10
+const populationSize = 5
 
 // Evolutionary Algorithm Params
 const mutateProbability = 0.7
@@ -19,6 +19,7 @@ const replacementSize = 2
 const cloneSizeFactor = 2
 const bestFitness = 50
 
+// main is the func that is called when starting the application.
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -42,7 +43,7 @@ func main() {
 	fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n\n", route, cost)
 
 	// Evolutionary Algorithm
-	// route, cost, _ := evolutionaryAlgorithm(cities)
+	// route, cost, _ := evolutionaryAlgorithm(cities16)
 	// fmt.Printf("Evolution Finished\nRoute: %v, Cost: %v\n", route, cost)
 
 	// Artificial Immune System
@@ -167,6 +168,9 @@ func generateRandomPopulation(cities [][]float64, popSize int) (population []Rou
 // the order of the other parent.
 func orderOneCrossover(p1 []int, p2 []int) (child []int) {
 	child = make([]int, len(p1))
+	for i := 0; i < len(child); i++ {
+		child[i] = -1
+	}
 
 	// Randomly select the section of one parent and give to child
 	start := rand.Intn(len(p1))
@@ -177,31 +181,32 @@ func orderOneCrossover(p1 []int, p2 []int) (child []int) {
 		start = end
 		end = tmp
 	}
-	fmt.Printf("start: %v\n", start)
-	fmt.Printf("end: %v\n", end)
 
 	used := make(map[int]bool)
-	for i := start; i < end; i++ {
+
+	for i := start; i <= end; i++ {
 		child[i] = p1[i]
 		used[p1[i]] = true
 	}
 
 	// Fill gaps in child with other parent
 	var tmp []int
+
 	for i := 0; i < len(p2); i++ {
 		if _, ok := used[p2[i]]; !ok {
 			tmp = append(tmp, p2[i])
 		}
 	}
 
+	next := 0
+	fmt.Printf("Start: %v\nEnd: %v\n", start, end)
+	fmt.Printf("Tmp: %v\n", tmp)
 	for i := 0; i < len(child); i++ {
-		if i >= start && i < end {
-			// Get next city
-			child[i] = tmp[0]
-			// pop city from p2
-			if len(tmp) > 1 {
-				tmp = tmp[1:]
-			}
+		if child[i] == -1 {
+			fmt.Printf("NExt: %v\n", next)
+			nextValue := tmp[next]
+			child[i] = nextValue
+			next++
 		}
 	}
 
