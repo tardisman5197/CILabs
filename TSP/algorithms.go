@@ -16,6 +16,7 @@ import (
 // Once all the permutations have been checked it returns the cheapest
 // route.
 func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float64) {
+	fmt.Printf("Starting Random Search\n")
 	start := time.Now()
 	line = [][]float64{{}, {}}
 
@@ -28,8 +29,8 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 
 	usedRoutes := make(map[string]bool)
 
-	// Loop through all permutations
-	for i := int64(0); i < noOfPermutations.Int64(); i++ {
+	// Loop till time finished
+	for {
 
 		// if i%10000 == 0 {
 		// 	percentageChecked := math.Ceil(float64(i+1) / float64(noOfPermutations.Int64()) * 100)
@@ -58,7 +59,7 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 					line[1] = append(line[1], cost)
 					line[0] = append(line[0], now.Sub(start).Seconds())
 
-					fmt.Printf("New cheapest found - %v : %v\n", route, cost)
+					// fmt.Printf("New cheapest found - %v : %v\n", route, cost)
 				}
 				break
 			}
@@ -88,6 +89,7 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 // of that route. From them permitations the best is found to start the
 // next iteration. This repeats until the best in that nbourhood is found.
 func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost float64, line [][]float64) {
+	fmt.Printf("Starting Local Search\n")
 	start := time.Now()
 	line = [][]float64{{}, {}}
 
@@ -130,7 +132,7 @@ func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost floa
 			globalBestRoute = localBestRoute
 			globalBestCost = localBestCost
 
-			fmt.Printf("Now Cheapest Route Found: %v - %v\n", globalBestRoute, globalBestCost)
+			// fmt.Printf("Now Cheapest Route Found: %v - %v\n", globalBestRoute, globalBestCost)
 
 			// Add new best to the graph points
 			now := time.Now()
@@ -242,13 +244,21 @@ func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float6
 //	5. Metadynamics, repace the worst d with random solutions
 //	6. Repeat until termination condition
 func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
+	fmt.Printf("Starting Artificial Immune System\n")
+	start := time.Now()
+
 	var population []Route
 
 	// Init population with random routes and Eval the routes.
 	population = generateRandomPopulation(cities, populationSize)
 
 	// Repeat until terminating condition
+<<<<<<< HEAD
+	// for i := 0; i < 2000; i++ {
+	for {
+=======
 	for i := 0; i < 5000; i++ {
+>>>>>>> master
 		// Cloning
 		var clonePool []Route
 		for j := 0; j < len(population); j++ {
@@ -303,6 +313,13 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 
 		bestRoute = population[0].route
 		bestCost = population[0].cost
+
+		// Check if ran out of time
+		now := time.Now()
+		if now.Sub(start).Seconds() >= executeTime {
+			fmt.Printf("Execute Time Acheived\n")
+			break
+		}
 	}
 	return
 }

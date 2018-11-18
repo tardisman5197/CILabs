@@ -35,25 +35,20 @@ func main() {
 	fmt.Printf("\n============\nStarting Algorithms\n\n")
 
 	// Random Search
-	// route, cost, randomLine := randomSearch(cities)
-	// fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n", route, cost)
+	route, cost, _ := randomSearch(cities16)
+	fmt.Printf("Random Finished\nRoute: %v, Cost: %v\n\n", route, cost)
 
 	// Local Search
-	// route, cost, localLine := localSearch(cities)
-	// fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n", route, cost)
+	route, cost, _ = localSearch(cities16)
+	fmt.Printf("Local Finished\nRoute: %v, Cost: %v\n\n", route, cost)
 
 	// Evolutionary Algorithm
 	// route, cost, _ := evolutionaryAlgorithm(cities16)
 	// fmt.Printf("Evolution Finished\nRoute: %v, Cost: %v\n", route, cost)
 
-	// p1 := []int{0, 1, 2, 3, 4, 5}
-	// p2 := []int{5, 4, 3, 2, 1, 0}
-	// fmt.Printf("Child: %v\n", orderOneCrossover(p1, p2))
-
 	// Artificial Immune System
-	fmt.Printf("Starting Artificial Immune System\n")
-	route, cost, _ := artificialImmuneSystem(cities16)
-	fmt.Printf("Artificial Immune System Finished!\nRoute: %v, Cost: %v\n", route, cost)
+	route, cost, _ = artificialImmuneSystem(cities16)
+	fmt.Printf("Artificial Immune System Finished!\nRoute: %v, Cost: %v\n\n", route, cost)
 }
 
 // demo finds the cheapest route from within the cities
