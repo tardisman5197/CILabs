@@ -253,12 +253,8 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 	population = generateRandomPopulation(cities, populationSize)
 
 	// Repeat until terminating condition
-<<<<<<< HEAD
 	// for i := 0; i < 2000; i++ {
 	for {
-=======
-	for i := 0; i < 5000; i++ {
->>>>>>> master
 		// Cloning
 		var clonePool []Route
 		for j := 0; j < len(population); j++ {
