@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"math/big"
 	"math/rand"
 	"sort"
 	"strings"
@@ -17,26 +16,21 @@ import (
 // route.
 func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float64) {
 	fmt.Printf("Starting Random Search\n")
+
 	start := time.Now()
+
 	line = [][]float64{{}, {}}
 
 	cost = math.MaxFloat64
 
-	var noOfPermutations big.Int
-	noOfPermutations.MulRange(1, int64(len(cities)-1))
-
+	// var noOfPermutations big.Int
+	// noOfPermutations.MulRange(1, int64(len(cities)-1))
 	// fmt.Printf("Number of Permutations: %v\n", noOfPermutations.Int64())
 
 	usedRoutes := make(map[string]bool)
 
 	// Loop till time finished
 	for {
-
-		// if i%10000 == 0 {
-		// 	percentageChecked := math.Ceil(float64(i+1) / float64(noOfPermutations.Int64()) * 100)
-		// 	// fmt.Printf("Pervcentage = %v\n", percentageChecked)
-		// 	// fmt.Printf("\rProgress: %v/%v - %v%%", i+1, noOfPermutations.Int64(), percentageChecked)
-		// }
 
 		var currentRoute []int
 
@@ -55,11 +49,10 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 					route = currentRoute
 					cost = currentCost
 
+					// Add new best to graph
 					now := time.Now()
 					line[1] = append(line[1], cost)
 					line[0] = append(line[0], now.Sub(start).Seconds())
-
-					// fmt.Printf("New cheapest found - %v : %v\n", route, cost)
 				}
 				break
 			}
@@ -75,9 +68,12 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 		now := time.Now()
 		if now.Sub(start).Seconds() >= executeTime {
 			fmt.Printf("Execute Time Acheived\n")
+
+			// Add last value to graph
 			now := time.Now()
 			line[1] = append(line[1], cost)
 			line[0] = append(line[0], now.Sub(start).Seconds())
+
 			break
 		}
 	}
@@ -90,12 +86,13 @@ func randomSearch(cities [][]float64) (route []int, cost float64, line [][]float
 // next iteration. This repeats until the best in that nbourhood is found.
 func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost float64, line [][]float64) {
 	fmt.Printf("Starting Local Search\n")
+
 	start := time.Now()
 	line = [][]float64{{}, {}}
 
 	globalBestCost = math.MaxFloat64
 
-	// Start a local search.
+	// Start a local search iterations.
 	for {
 		// Generate starting route
 		localBestRoute := generateRandomRoute(len(cities))
@@ -103,11 +100,13 @@ func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost floa
 
 		// Find local optimal value
 		for {
+			// Get all the permutations of the two opt swap
 			neighbourhood := twoOpt(localBestRoute)
 
+			// Find best route in the neighbourhood
 			currentRoute, currentCost := bestNeighbourStep(cities, neighbourhood)
-			// fmt.Printf("%v - %v\n", currentRoute, currentCost)
 
+			// Check if the best has been improved upon
 			if currentCost < localBestCost {
 				// New cheapest found
 				localBestRoute = currentRoute
@@ -132,8 +131,6 @@ func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost floa
 			globalBestRoute = localBestRoute
 			globalBestCost = localBestCost
 
-			// fmt.Printf("Now Cheapest Route Found: %v - %v\n", globalBestRoute, globalBestCost)
-
 			// Add new best to the graph points
 			now := time.Now()
 			line[1] = append(line[1], globalBestCost)
@@ -145,6 +142,7 @@ func localSearch(cities [][]float64) (globalBestRoute []int, globalBestCost floa
 		if now.Sub(start).Seconds() >= executeTime {
 			fmt.Printf("Execute Time Acheived\n")
 
+			// Add last best to the graph points
 			now := time.Now()
 			line[1] = append(line[1], globalBestCost)
 			line[0] = append(line[0], now.Sub(start).Seconds())
@@ -245,6 +243,7 @@ func evolutionaryAlgorithm(cities [][]float64) (bestRoute []int, bestCost float6
 //	6. Repeat until termination condition
 func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float64, line [][]float64) {
 	fmt.Printf("Starting Artificial Immune System\n")
+
 	start := time.Now()
 
 	var population []Route
@@ -252,10 +251,10 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 	// Init population with random routes and Eval the routes.
 	population = generateRandomPopulation(cities, populationSize)
 
-	// Repeat until terminating condition
-	// for i := 0; i < 2000; i++ {
+	// Repeat until terminating condition (executeTime)
 	for {
 		// Cloning
+		// Create cloneSizeFactor amount of copies of each route in the population
 		var clonePool []Route
 		for j := 0; j < len(population); j++ {
 			for k := 0; k < cloneSizeFactor; k++ {
@@ -268,6 +267,10 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 		}
 
 		// Mutation
+		// For each clone in the pool:
+		// 	1. Choose a random hotspot
+		// 	2. Calc the length of section based on its fitness comapred to the best
+		//  3. Reverse the section selected and place back into route
 		for j := 0; j < len(clonePool); j++ {
 			// Random hotspot
 			start := rand.Intn(len(clonePool[j].route))
@@ -289,17 +292,26 @@ func artificialImmuneSystem(cities [][]float64) (bestRoute []int, bestCost float
 				clonePool[j].route[(k+start)%size] = tmp[len(tmp)-(k+1)]
 			}
 
+			// Get the new cost of the clone
 			clonePool[j].cost = getCostOfRoute(cities, clonePool[j].route)
 		}
 
 		// Selection
+		// 1. Combine the population and clone pool
+		// 2. Sort the population by fitness
+		// 3. Remove worst routes to get back to population size
+
+		// Combine clones and original population
 		population = append(population, clonePool...)
 
+		//Sort by fitness
 		sort.SliceStable(population, func(i, j int) bool { return population[i].cost < population[j].cost })
 
+		// Remove the worst routes
 		population = population[:populationSize]
 
 		// Metadynamics
+		// Swap the worst kth routes with new random routes
 		for j := 1; j <= replacementSize; j++ {
 			var currentRoute Route
 			currentRoute.route = generateRandomRoute(len(cities))

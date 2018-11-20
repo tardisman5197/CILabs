@@ -43,25 +43,31 @@ func randomSearch(noOfAntennae int, steeringAngle float64) (design []float64, pe
 // by creating a population of valid solutions, then flocking
 // towards the best soloution in the population.
 func PSO(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL float64) {
+	fmt.Printf("Starting PSO\n")
+
+	// Init antennaArray
 	var a AntennaArray
 	a.noOfAntennae = noOfAntennae
 	a.steeringAngle = steeringAngle
 
 	var population []Particle
 
-	fmt.Printf("Starting PSO\n")
-
-	// INITIALISE population
+	// INITIALISE population, with random designs
 	for i := 0; i < 30; i++ {
 		currentParticle := Particle{}
+		// Find a random design
 		currentParticle.currentPostion = randomDesign(noOfAntennae)
+		// Set the best peak values
 		currentParticle.pBest = currentParticle.currentPostion
 		currentParticle.pBestPeak, _ = a.evaluate(currentParticle.currentPostion)
+		// Set the inital velocity to the differnce between the init position
+		// and another random position divided by 2
 		currentParticle.currentVelocity = make([]float64, noOfAntennae)
 		tmp := randomDesign(noOfAntennae)
 		for i, pos := range currentParticle.currentPostion {
 			currentParticle.currentVelocity[i] = (tmp[i] - pos) / 2
 		}
+
 		population = append(population, currentParticle)
 	}
 
