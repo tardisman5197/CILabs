@@ -9,22 +9,14 @@ import (
 
 const executeTime = 10
 
+const numberofAntennae = 5
+const steeringAngle = 90
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	// var a AntennaArray
-	// a.noOfAntennae = 3
-	// a.steeringAngle = 90
-	// // design := []float64{0.5, 1.0, 1.5}
-	// // peakSSL, err := a.evaluate(design)
-	// // if err != nil {
-	// // 	panic(err)
-	// // }
-	// // fmt.Printf("Peak SSL: %v\n", peakSSL)
-
-	// design, peakSSL := randomSearch(3, 90)
-
-	design, peakSSL := PSO(10, 90)
+	fmt.Printf("Execute time: %v\nNumber Of Antennae: %v\nSteering Angle: %v\n\n", executeTime, numberofAntennae, steeringAngle)
+	design, peakSSL := PSO(numberofAntennae, steeringAngle)
 	fmt.Printf("Design: %v PeakSSL: %v\n", design, peakSSL)
 }
 

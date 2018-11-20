@@ -24,13 +24,13 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	// Read Files
-	// fmt.Printf("\n============\n")
-	// fmt.Printf("cities10.csv\n")
-	// cities10 := getCitiesFromFile("files/cities10.csv")
+	fileName := "cities16.csv"
 
 	fmt.Printf("\n============\n")
-	fmt.Printf("cities16.csv\n")
-	cities16 := getCitiesFromFile("files/cities16.csv")
+	fmt.Printf("%v\n", fileName)
+	cities16 := getCitiesFromFile("files/" + fileName)
+
+	fmt.Printf("Execute Time: %v\n", executeTime)
 
 	fmt.Printf("\n============\nStarting Algorithms\n\n")
 

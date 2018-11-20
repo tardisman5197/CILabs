@@ -100,7 +100,7 @@ func PSO(noOfAntennae int, steeringAngle float64) (design []float64, peakSSL flo
 		// Termination condition
 		now := time.Now()
 		if now.Sub(start).Seconds() >= executeTime {
-			fmt.Printf("Time Finshed!\n")
+			fmt.Printf("Execute Time Acheived\n")
 			break
 		}
 	}
